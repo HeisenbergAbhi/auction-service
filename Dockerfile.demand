@@ -1,0 +1,26 @@
+# Use the official Golang image as the base image
+FROM golang:1.17-alpine as builder
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the source code to the working directory
+COPY . .
+
+# Build the Go application
+RUN go build -o demand-side .
+
+# Use a minimal Alpine image as the base image for the final container
+FROM alpine:latest
+
+# Copy the binary from the builder stage to the final container
+COPY --from=builder /app/demand-side /app/demand-side
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Expose the port on which the application listens
+EXPOSE 8001
+
+# Start the application
+CMD ["./demand-side"]
